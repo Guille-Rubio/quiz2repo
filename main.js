@@ -1,3 +1,5 @@
+
+//Selectores
 const pregunta = document.getElementById("pregunta");
 const opcion1label = document.getElementById("opcion1label");
 const opcion2label = document.getElementById("opcion2label");
@@ -10,10 +12,20 @@ const opcion4 = document.getElementById("opcion4");
 const questionCounter = document.getElementById("questionNumber");
 const botonNext = document.getElementById("next");
 const botonresults = document.getElementById("send-results");
+
+//********* VARIABLES GLOBALES */
+
 let numPregunta = 0;
 let preguntas;
-//let j = 1;
 let k = 0;
+
+
+
+
+// *************** QUIZ ***********************
+
+
+
 
 /*leer 10 preguntas random de la api*/
 async function buscarPreguntas() {
@@ -39,19 +51,19 @@ ejecucionAsincrona();
 const partida = []; //resultado de las respuestas
 
 function pintarNumPregunta() {
-  questionNumber.innerHTML = "question number " + k ;
+  questionNumber.innerHTML = "question number " + (k + 1);
 }
 
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
   opcion1label.innerHTML = preguntas[k].incorrect_answers[0];
-  opcion1.setAttribute("value",preguntas[k].incorrect_answers[0])
+  opcion1.setAttribute("value", preguntas[k].incorrect_answers[0]);
   opcion2label.innerHTML = preguntas[k].incorrect_answers[1];
-  opcion2.setAttribute("value",preguntas[k].incorrect_answers[1])
+  opcion2.setAttribute("value", preguntas[k].incorrect_answers[1]);
   opcion3label.innerHTML = preguntas[k].incorrect_answers[2];
-  opcion3.setAttribute("value",preguntas[k].incorrect_answers[2])
+  opcion3.setAttribute("value", preguntas[k].incorrect_answers[2]);
   opcion4label.innerHTML = preguntas[k].correct_answer;
-  opcion4.setAttribute("value",preguntas[k].correct_answer);
+  opcion4.setAttribute("value", preguntas[k].correct_answer);
   pintarNumPregunta();
 }
 
@@ -63,11 +75,6 @@ function unCheckOptions() {
 }
 
 function checkAnswers() {
-console.log(opcion1.value, preguntas[k].correct_answer)
-console.log(opcion2.value, preguntas[k].correct_answer)
-console.log(opcion3.value, preguntas[k].correct_answer)
-console.log(opcion4.value, preguntas[k].correct_answer)
-
   if (opcion1.checked) {
     if (opcion1.value == preguntas[k].correct_answer) {
       partida.push(true);
@@ -95,8 +102,6 @@ console.log(opcion4.value, preguntas[k].correct_answer)
   }
 }
 
-
-
 botonNext.addEventListener("click", () => {
   if (
     !opcion1.checked &&
@@ -105,11 +110,9 @@ botonNext.addEventListener("click", () => {
     !opcion4.checked
   ) {
     alert("Debes seleccionar al menos una opción");
-
   } else {
     if (k < 10) {
       checkAnswers();
-      console.log(partida)
       k++;
       pintarPreguntas();
       pintarNumPregunta();
@@ -125,4 +128,5 @@ botonNext.addEventListener("click", () => {
     }
   }
 });
+
 

@@ -5,12 +5,26 @@ body {
     height:100vh;
     overflow:hidden;/*removes scroll bars */ 
 }
-/*
-form {
-    margin: 5vh auto auto auto;
-    
+
+a{
+    text-decoration: none;
 }
-*/
+
+#home-header{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    height:20vh;
+  
+}
+#bienvenida{
+    display:flex;
+    flex-direction: column;
+}
+
+.display{
+    display: none;
+}
 
 main{
 display:flex;
