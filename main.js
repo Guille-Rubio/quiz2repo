@@ -10,52 +10,92 @@ const opcion4 = document.getElementById("opcion4");
 const questionCounter = document.getElementById("questionNumber");
 const botonNext = document.getElementById("next");
 const botonresults = document.getElementById("send-results");
+let numPregunta = 0;
+let preguntas;
+//let j = 1;
 let k = 0;
-let arr;
-let j = 1;
 
-/*leer 10 preguntas random de la api*/ // FUNCIONA NO BORRAR!!!
+/*leer 10 preguntas random de la api*/
 async function buscarPreguntas() {
-  //DECLARA LA FUNCION
   try {
     let response = await fetch(
       `https://opentdb.com/api.php?amount=10&difficulty=easy&type=multiple`
     );
     let data = await response.json();
-    let preguntas = data.results
-    arr = preguntas;
-    //return data;
+    let resultadosData = data.results;
+    preguntas = resultadosData;
   } catch (error) {
     console.log(`ERROR: ${error.stack}`);
   }
 }
 
+async function ejecucionAsincrona() {
+  await buscarPreguntas();
+  await pintarPreguntas();
+  console.log(preguntas, "este es el bueno");
+}
+ejecucionAsincrona();
 
 const partida = []; //resultado de las respuestas
 
 function pintarNumPregunta() {
-  questionNumber.innerHTML = "question number " + j;
+  questionNumber.innerHTML = "question number " + k ;
 }
 
 async function pintarPreguntas() {
-  
-  pregunta.innerHTML = arr[k].question;
-  
-  opcion1label.innerHTML = arr[k].incorrect_answers[0];
-  opcion2label.innerHTML = arr[k].incorrect_answers[1];
-  opcion3label.innerHTML = arr[k].incorrect_answers[2];
-  opcion4label.innerHTML = arr[k].correct_answer;
-  
+  pregunta.innerHTML = preguntas[k].question;
+  opcion1label.innerHTML = preguntas[k].incorrect_answers[0];
+  opcion1.setAttribute("value",preguntas[k].incorrect_answers[0])
+  opcion2label.innerHTML = preguntas[k].incorrect_answers[1];
+  opcion2.setAttribute("value",preguntas[k].incorrect_answers[1])
+  opcion3label.innerHTML = preguntas[k].incorrect_answers[2];
+  opcion3.setAttribute("value",preguntas[k].incorrect_answers[2])
+  opcion4label.innerHTML = preguntas[k].correct_answer;
+  opcion4.setAttribute("value",preguntas[k].correct_answer);
   pintarNumPregunta();
 }
 
-async function nombre (){
-await buscarPreguntas();
-await pintarPreguntas();
-console.log(arr, "este es el bueno");
-
+function unCheckOptions() {
+  opcion1.checked = false;
+  opcion2.checked = false;
+  opcion3.checked = false;
+  opcion4.checked = false;
 }
-nombre();
+
+function checkAnswers() {
+console.log(opcion1.value, preguntas[k].correct_answer)
+console.log(opcion2.value, preguntas[k].correct_answer)
+console.log(opcion3.value, preguntas[k].correct_answer)
+console.log(opcion4.value, preguntas[k].correct_answer)
+
+  if (opcion1.checked) {
+    if (opcion1.value == preguntas[k].correct_answer) {
+      partida.push(true);
+    } else {
+      partida.push(false);
+    }
+  } else if (opcion2.checked) {
+    if (opcion2.value == preguntas[k].correct_answer) {
+      partida.push(true);
+    } else {
+      partida.push(false);
+    }
+  } else if (opcion3.checked) {
+    if (opcion3.value == preguntas[k].correct_answer) {
+      partida.push(true);
+    } else {
+      partida.push(false);
+    }
+  } else if (opcion4.checked) {
+    if (opcion4.value == preguntas[k].correct_answer) {
+      partida.push(true);
+    } else {
+      partida.push(false);
+    }
+  }
+}
+
+
 
 botonNext.addEventListener("click", () => {
   if (
@@ -65,12 +105,15 @@ botonNext.addEventListener("click", () => {
     !opcion4.checked
   ) {
     alert("Debes seleccionar al menos una opción");
+
   } else {
     if (k < 10) {
+      checkAnswers();
+      console.log(partida)
       k++;
-      j++;
       pintarPreguntas();
       pintarNumPregunta();
+      unCheckOptions();
 
       //console.log(preguntas.results);
     } else if (k == 10) {
@@ -82,5 +125,4 @@ botonNext.addEventListener("click", () => {
     }
   }
 });
-
 
