@@ -1,0 +1,155 @@
+body {
+    font-family: 'Comfortaa', cursive;
+    font-size: 1.2em;
+    width:auto;
+    height:100vh;
+    overflow:hidden;/*removes scroll bars */ 
+}
+/*
+form {
+    margin: 5vh auto auto auto;
+    
+}
+*/
+
+main{
+display:flex;
+justify-content: center;
+align-items: center;
+align-content: center;
+margin:0;
+
+}
+.question {
+    display: flex;
+    margin: 5px;
+    min-height: 10vh;
+}
+
+h3 {
+    margin: auto;
+    text-align: center;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: auto;
+    height: 70vh;
+    
+}
+
+.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width:400px;
+    margin: 15px;
+    border-radius:15px;
+    padding:20px;
+
+}
+
+.card:nth-child(1){
+    box-shadow: inset 0px 0px 18px 7px rgba(46,255,171,0.76);
+}
+.card:nth-child(2){
+    box-shadow: inset 0px 0px 18px 7px rgba(234,46,255,0.76);
+}
+.card:nth-child(3){
+    box-shadow: inset 0px 0px 18px 7px rgba(46, 255, 252, 0.76);
+}
+.card:nth-child(4){
+    box-shadow: inset 0px 0px 18px 7px rgba(255, 46, 46, 0.76);
+}
+
+input[type="radio"] {
+    /*display: none;*/
+}
+
+
+label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+    border-radius: 15px;
+}
+
+.selected{
+    border:2px solid black;
+}
+
+.submit-next-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 100%;
+    margin-top: 5vh 0 0 0;
+}
+
+#send-results{
+    display: flex;
+    justify-content: center;
+    
+}
+
+#butonsend{
+    font-size: 25px;
+    border: 2px solid black;
+    border-radius: 6px;
+}
+
+#next {
+    display:inline-block;
+    height: 30px;
+    width: 100px;
+    border: 2px solid black;
+    width: 150px;
+    height: 50px;
+    cursor: pointer;
+    background: #6dd6d1;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 10px 25px #040e0d, 0px -10px 25px #a6fffa, inset 0px -5px 10px #57aba7, inset 0px 5px 10px #a6fffa;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    color: white;
+    font-size: 20px;
+    transition: 500ms;  
+}
+
+#next:hover {
+    border: 2px solid #6dd6d1;
+    animation: hueRotation 2s linear infinite;
+}
+
+@keyframes hueRotation {
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+
+button:focus {
+    outline: none;
+}
+
+.hidden{
+    display:none;
+}
+
+@media only screen and (min-width: 767px) {
+
+.options{
+    gap:30px;
+   
+   
+}
+
+}
