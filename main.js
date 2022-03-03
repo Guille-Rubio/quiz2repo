@@ -10,53 +10,77 @@ const opcion4 = document.getElementById("opcion4");
 const questionCounter = document.getElementById("questionNumber");
 const botonNext = document.getElementById("next");
 const botonresults = document.getElementById("send-results");
-let k=1
-let arr=[]
+let k = 0;
+let arr;
+let j = 1;
+
 /*leer 10 preguntas random de la api*/ // FUNCIONA NO BORRAR!!!
-async function getUserAsync() { //DECLARA LA FUNCION 
+async function buscarPreguntas() {
+  //DECLARA LA FUNCION
   try {
     let response = await fetch(
       `https://opentdb.com/api.php?amount=10&difficulty=easy&type=multiple`
     );
     let data = await response.json();
-    console.log(data.results)
-    return data;
-    
+    let preguntas = data.results
+    arr = preguntas;
+    //return data;
   } catch (error) {
     console.log(`ERROR: ${error.stack}`);
   }
 }
 
 
-async function pintarPreguntas(){
-   let preguntas = await getUserAsync();
-   let dat = preguntas.results[0]
-   pregunta.innerHTML = dat.question;
-   opcion1label.innerHTML = dat.incorrect_answers[0];
-   opcion2label.innerHTML = dat.incorrect_answers[1];
-   opcion3label.innerHTML = dat.incorrect_answers[2];
-   opcion4label.innerHTML = dat.correct_answer;
-   questionNumber.innerHTML = "question number 1";
+const partida = []; //resultado de las respuestas
 
-   botonNext.addEventListener("click", () => {
-    let otro = preguntas.results[k] 
-    if (k < 10) {
-      k++;
-     questionNumber.innerHTML = "question number " + k;
-     console.log(preguntas.results);
-     pregunta.innerHTML = otro.question;
-     opcion1label.innerHTML = otro.incorrect_answers[0];
-     opcion2label.innerHTML = otro.incorrect_answers[1];
-     opcion3label.innerHTML = otro.incorrect_answers[2];
-     opcion4label.innerHTML = otro.correct_answer;
-    } else if(k==10){
-      const button1 = document.createElement('button'); 
-      button1.type = 'button'; 
-      button1.setAttribute("id", "butonsend")
-      button1.innerText = 'Finalizar'; 
-      botonresults.appendChild(button1); 
-    }
-  })
+function pintarNumPregunta() {
+  questionNumber.innerHTML = "question number " + j;
+}
+
+async function pintarPreguntas() {
+  
+  pregunta.innerHTML = arr[k].question;
+  
+  opcion1label.innerHTML = arr[k].incorrect_answers[0];
+  opcion2label.innerHTML = arr[k].incorrect_answers[1];
+  opcion3label.innerHTML = arr[k].incorrect_answers[2];
+  opcion4label.innerHTML = arr[k].correct_answer;
+  
+  pintarNumPregunta();
+}
+
+async function nombre (){
+await buscarPreguntas();
+await pintarPreguntas();
+console.log(arr, "este es el bueno");
 
 }
-pintarPreguntas();
+nombre();
+
+botonNext.addEventListener("click", () => {
+  if (
+    !opcion1.checked &&
+    !opcion2.checked &&
+    !opcion3.checked &&
+    !opcion4.checked
+  ) {
+    alert("Debes seleccionar al menos una opción");
+  } else {
+    if (k < 10) {
+      k++;
+      j++;
+      pintarPreguntas();
+      pintarNumPregunta();
+
+      //console.log(preguntas.results);
+    } else if (k == 10) {
+      const button1 = document.createElement("button");
+      button1.type = "button";
+      button1.setAttribute("id", "butonsend");
+      button1.innerText = "Finalizar";
+      botonresults.appendChild(button1);
+    }
+  }
+});
+
+
