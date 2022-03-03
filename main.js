@@ -1,3 +1,20 @@
+// Your web app's Firebase configuration
+let firebaseConfig = {
+  apiKey: "AIzaSyDz1tQjEXFCDEWnRm9J8MzHtzXkNPhjyfU",
+  authDomain: "quiz2-ce40f.firebaseapp.com",
+  projectId: "quiz2-ce40f",
+  storageBucket: "quiz2-ce40f.appspot.com",
+  messagingSenderId: "466936444764",
+  appId: "1:466936444764:web:2e5376aa50a5d2d47fb399",
+};
+
+//const firebase = require("firebase");
+// Required for side-effects
+//require("firebase/firestore");
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 //Selectores
 const pregunta = document.getElementById("pregunta");
@@ -13,19 +30,25 @@ const questionCounter = document.getElementById("questionNumber");
 const botonNext = document.getElementById("next");
 const botonresults = document.getElementById("send-results");
 
+//funciones para mostrar y ocultar botones
+function ocultar(element) {
+  element.classList.add("display");
+}
+function esconder(element) {
+  //Refactorizar para todos los botones
+  element.classList.add("hidden");
+}
+function mostrar(element) {
+  element.classList.remove("display");
+}
+
 //********* VARIABLES GLOBALES */
 
-let numPregunta = 0;
 let preguntas;
-let k = 0;
-
-
-
+let k = 0; //contador del array de preguntas
+let numPregunta = 1; //contador de número de pregunta mostrada
 
 // *************** QUIZ ***********************
-
-
-
 
 /*leer 10 preguntas random de la api*/
 async function buscarPreguntas() {
@@ -51,7 +74,7 @@ ejecucionAsincrona();
 const partida = []; //resultado de las respuestas
 
 function pintarNumPregunta() {
-  questionNumber.innerHTML = "question number " + (k + 1);
+  questionNumber.innerHTML = "question number " + numPregunta;
 }
 
 async function pintarPreguntas() {
@@ -102,6 +125,39 @@ function checkAnswers() {
   }
 }
 
+
+
+const user = firebase.auth().currentUser;
+
+if (user !== null) {
+  // The user object has basic properties such as display name, email, etc.
+  //const displayName = user.displayName;
+  const email = user.email;
+  const photoURL = user.photoURL;
+  const emailVerified = user.emailVerified;
+  // The user's ID, unique to the Firebase project. Do NOT use
+  // this value to authenticate with your backend server, if
+  // you have one. Use User.getIdToken() instead.
+  const uid = user.uid;
+}
+
+function guardarPartida() {
+  db.collection("juegos")
+    .add({
+      usuario: user, //acceder a valor de usuario logado
+      fecha: Date(),
+      puntuacion: partida.filter((pregunta) => pregunta).length,
+    })
+    .then((docRef) => {
+      console.log("Document written with ID: ", docRef.id);
+    })
+    .catch((error) => {
+      console.error("Error adding document: ", error);
+    });
+}
+
+//********** BOTON NEXT  ************/
+
 botonNext.addEventListener("click", () => {
   if (
     !opcion1.checked &&
@@ -113,20 +169,36 @@ botonNext.addEventListener("click", () => {
   } else {
     if (k < 10) {
       checkAnswers();
-      k++;
-      pintarPreguntas();
-      pintarNumPregunta();
       unCheckOptions();
+      k++;
+      numPregunta++;
+      pintarPreguntas();
+      if (numPregunta < 10) {
+        pintarNumPregunta();
+      }
+      console.log("valor k " + k);
+      console.log("partida", partida);
 
       //console.log(preguntas.results);
-    } else if (k == 10) {
-      const button1 = document.createElement("button");
-      button1.type = "button";
-      button1.setAttribute("id", "butonsend");
-      button1.innerText = "Finalizar";
-      botonresults.appendChild(button1);
+    }
+    if (k === 9) {
+      console.log("hola hola");
+      mostrar(botonFinalizar);
+      esconder(botonNext);
     }
   }
 });
 
+//*************** BOTON FINALIZAR ******************
+const botonFinalizar = document.createElement("button");
+botonFinalizar.type = "button";
+botonFinalizar.setAttribute("id", "botonSend");
+botonFinalizar.innerText = "Finalizar";
+botonresults.appendChild(botonFinalizar);
 
+botonFinalizar.addEventListener("click", () => {
+  checkAnswers();
+  unCheckOptions();
+  console.log(partida);
+  guardarPartida();
+});

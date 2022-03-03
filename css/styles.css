@@ -26,6 +26,10 @@ a{
     display: none;
 }
 
+.hidden{
+    visibility:hidden;
+}
+
 main{
 display:flex;
 justify-content: center;

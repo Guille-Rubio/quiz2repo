@@ -7,38 +7,16 @@ let firebaseConfig = {
   messagingSenderId: "466936444764",
   appId: "1:466936444764:web:2e5376aa50a5d2d47fb399",
 };
+
+//const firebase = require("firebase");
+// Required for side-effects
+//require("firebase/firestore");
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const loginWithGoogle = function () {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  firebase
-    .auth()
-    .signInWithPopup(provider)
-    .then((result) => {
-      /** @type {firebase.auth.OAuthCredential} */
-      const credential = result.credential;
-
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      // ...
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      const credential = error.credential;
-      // ...
-
-      console.log(errorMessage);
-    });
-};
+//************** FUNCIONES AUXILIARES **************** */
 
 function ocultar(element) {
   element.classList.add("display");
@@ -48,24 +26,50 @@ function mostrar(element) {
   element.classList.remove("display");
 }
 
+//**** Selectores  *******/
 const botonLogin = document.getElementById("botonLogin");
 const botonSignOut = document.getElementById("botonSignOut");
 const botonComenzar = document.getElementById("comenzar");
 
+//******************* LOGIN CON GOOGLE******************** */
+const loginWithGoogle = function () {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+      /** @type {firebase.auth.OAuthCredential} */
+      const credential = result.credential;
+      const token = credential.accessToken;
+      const user = result.user;
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.email;
+      const credential = error.credential;
+      console.log(errorMessage);
+    });
+};
+
+
+
 firebase.auth().onAuthStateChanged((user) => {
+  usuarioActivo = user.username;
   if (user) {
     ocultar(botonLogin);
     mostrar(botonSignOut);
     mostrar(botonComenzar);
-    
+
     //meter función pintar gráfica
     //boton acceder al quiz
 
     const uid = user.uid;
+    usuarioActivo = uid;
   } else {
   }
 });
-
 
 function signOut() {
   firebase
