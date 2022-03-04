@@ -7,6 +7,8 @@
     <meta name="author" content="TheBridge" />
     <meta name="description" content="Plantilla simple HTML5" />
     <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
     <link
       rel="shortcut icon"
       href="/media/bg/quesito.png"
@@ -16,6 +18,9 @@
       href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;600;700&display=swap"
       rel="stylesheet"
     />
+    
+   
+    
    
   </head>
 
@@ -29,21 +34,30 @@
             <button onclick="signOut()" id="botonSignOut" class="display">Sign Out</button>
            
         </section> 
-    </header>
 
+        
+
+    </header>
+    
     <main >
+  
+  
      
+
+
     </main>
 
     <footer>
-
+      <div class="ct-chart"></div>
 
     </footer>
+    
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
     <!-- TODO: Add SDKs for Firebase products that you want to use
         https://firebase.google.com/docs/web/setup#available-libraries -->
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
     <script src="/main.js"></script>
+    
   </body>
 </html>

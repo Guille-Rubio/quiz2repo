@@ -302,7 +302,7 @@ botonNext.addEventListener("click", () => {
   }
 });
 
-//*************** BOTON FINALIZAR ******************
+/*************** BOTON FINALIZAR ******************/
 const botonFinalizar = document.createElement("button");
 botonFinalizar.type = "button";
 botonFinalizar.setAttribute("id", "botonSend");
@@ -315,3 +315,26 @@ botonFinalizar.addEventListener("click", () => {
   console.log(partida);
   guardarPartida();
 });
+
+
+
+//************GRAFICA ************ */
+
+const games = {
+  // A labels array that can contain any sort of values
+  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  
+  series: [
+    [5, 2, 4, 2, 0]
+  ]
+};
+
+const settings = {
+  width:300,
+  height:200
+}
+
+// Create a new line chart object where as first parameter we pass in a selector
+// that is resolving to our chart container element. The Second parameter
+// is the actual data object.
+new Chartist.Line('.ct-chart', games, settings);
