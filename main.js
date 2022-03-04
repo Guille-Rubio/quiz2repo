@@ -16,6 +16,106 @@ let firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+//**************** LOGIN CON GOOGLE ***************** */
+
+let usuarioActivo;
+
+//login con google (pop up)
+const loginWithGoogle = function () {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+      /** @type {firebase.auth.OAuthCredential} */
+      const credential = result.credential;
+      const token = credential.accessToken;
+      const user = result.user.displayName;
+      usuarioActivo = user;
+      console.log(user, "on login");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.email;
+      const credential = error.credential;
+      console.log(errorMessage);
+    });
+};
+
+
+
+//Escuchador de eventos del usuario
+firebase.auth().onAuthStateChanged((user) => {
+  
+  if (user) {
+    ocultar(botonLogin);
+    mostrar(botonSignOut);
+    mostrar(botonComenzar);
+    h1home.innerHTML="Bienvenido "+ usuarioActivo;
+
+    //meter función pintar gráfica
+    //boton acceder al quiz
+
+    const uid = user.uid;
+  } else {
+  }
+});
+
+//Persistencia sesion (por defecto ya es local)
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => {
+    // Existing and future Auth states are now persisted in the current
+    // session only. Closing the window would clear any existing state even
+    // if a user forgets to sign out.
+    // ...
+    // New sign-in will be persisted with session persistence.
+    return firebase.auth().signInWithEmailAndPassword(email, password);
+  })
+  .catch((error) => {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+  });
+
+
+
+// Log out 
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      console.log("El usuario ha abandonado la sesión");
+      mostrar(botonLogin);
+      ocultar(botonSignOut);
+      ocultar(botonComenzar);
+      h1Home.innerHTML= "¡Bienvenido a nuestro nuevo Quiz!";
+    })
+    .catch((error) => {
+      console.log("No se pudo cerrar sesión correctamente");
+    });
+}
+
+
+//obetener perfil de usuario
+const user = firebase.auth().currentUser;
+console.log(user);
+if (user !== null) {
+  // The user object has basic properties such as display name, email, etc.
+  const displayName = user.displayName;
+  const email = user.email;
+  const photoURL = user.photoURL;
+  const emailVerified = user.emailVerified;
+
+  // The user's ID, unique to the Firebase project. Do NOT use
+  // this value to authenticate with your backend server, if
+  // you have one. Use User.getIdToken() instead.
+  const uid = user.uid;
+}
+
+
 //Selectores
 const pregunta = document.getElementById("pregunta");
 const opcion1label = document.getElementById("opcion1label");
@@ -29,6 +129,11 @@ const opcion4 = document.getElementById("opcion4");
 const questionCounter = document.getElementById("questionNumber");
 const botonNext = document.getElementById("next");
 const botonresults = document.getElementById("send-results");
+const botonLogin = document.getElementById("botonLogin");
+const botonSignOut = document.getElementById("botonSignOut");
+const botonComenzar = document.getElementById("comenzar");
+const h1home = document.getElementById("h1Home");
+const userBox =document.getElementById("displayUser");
 
 //funciones para mostrar y ocultar botones
 function ocultar(element) {
@@ -64,10 +169,23 @@ async function buscarPreguntas() {
   }
 }
 
+function barajarOpciones(array) {
+  let currentIndex = array.length,
+    randomIndex;
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+  return array;
+}
+
 async function ejecucionAsincrona() {
   await buscarPreguntas();
   await pintarPreguntas();
-  console.log(preguntas, "este es el bueno");
 }
 ejecucionAsincrona();
 
@@ -79,14 +197,23 @@ function pintarNumPregunta() {
 
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
-  opcion1label.innerHTML = preguntas[k].incorrect_answers[0];
-  opcion1.setAttribute("value", preguntas[k].incorrect_answers[0]);
-  opcion2label.innerHTML = preguntas[k].incorrect_answers[1];
-  opcion2.setAttribute("value", preguntas[k].incorrect_answers[1]);
-  opcion3label.innerHTML = preguntas[k].incorrect_answers[2];
-  opcion3.setAttribute("value", preguntas[k].incorrect_answers[2]);
-  opcion4label.innerHTML = preguntas[k].correct_answer;
-  opcion4.setAttribute("value", preguntas[k].correct_answer);
+
+  let opciones = [
+    preguntas[k].incorrect_answers[0],
+    preguntas[k].incorrect_answers[1],
+    preguntas[k].incorrect_answers[2],
+    preguntas[k].correct_answer,
+  ];
+  opciones = barajarOpciones(opciones);
+
+  opcion1label.innerHTML = opciones[0];
+  opcion1.setAttribute("value", opciones[0]);
+  opcion2label.innerHTML = opciones[1];
+  opcion2.setAttribute("value", opciones[1]);
+  opcion3label.innerHTML = opciones[2];
+  opcion3.setAttribute("value", opciones[2]);
+  opcion4label.innerHTML = opciones[3];
+  opcion4.setAttribute("value", opciones[3]);
   pintarNumPregunta();
 }
 
@@ -127,20 +254,6 @@ function checkAnswers() {
 
 
 
-const user = firebase.auth().currentUser;
-
-if (user !== null) {
-  // The user object has basic properties such as display name, email, etc.
-  //const displayName = user.displayName;
-  const email = user.email;
-  const photoURL = user.photoURL;
-  const emailVerified = user.emailVerified;
-  // The user's ID, unique to the Firebase project. Do NOT use
-  // this value to authenticate with your backend server, if
-  // you have one. Use User.getIdToken() instead.
-  const uid = user.uid;
-}
-
 function guardarPartida() {
   db.collection("juegos")
     .add({
@@ -166,6 +279,7 @@ botonNext.addEventListener("click", () => {
     !opcion4.checked
   ) {
     alert("Debes seleccionar al menos una opción");
+  
   } else {
     if (k < 10) {
       checkAnswers();
@@ -182,7 +296,6 @@ botonNext.addEventListener("click", () => {
       //console.log(preguntas.results);
     }
     if (k === 9) {
-      console.log("hola hola");
       mostrar(botonFinalizar);
       esconder(botonNext);
     }

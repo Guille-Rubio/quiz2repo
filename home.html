@@ -16,12 +16,13 @@
       href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;600;700&display=swap"
       rel="stylesheet"
     />
+   
   </head>
 
   <body id="body-home">
     <header id="home-header">
         <section id="bienvenida">
-            <h1>¡Bienvenido a nuestro nuevo Quiz!</h1>
+            <h1 id="h1Home">¡Bienvenido a nuestro nuevo Quiz!</h1>
             <p>Pon a prueba tus conocimientos con nuestro QUIZ</p>
             <button onclick="loginWithGoogle()" id="botonLogin">Accede con Google</button>
             <a href="/pages/question.html" id="comenzar" class="display">Comenzar el quiz</a>
@@ -34,12 +35,15 @@
      
     </main>
 
-    <footer></footer>
+    <footer>
+
+
+    </footer>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
     <!-- TODO: Add SDKs for Firebase products that you want to use
         https://firebase.google.com/docs/web/setup#available-libraries -->
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
-    <script src="/login.js"></script>
+    <script src="/main.js"></script>
   </body>
 </html>
