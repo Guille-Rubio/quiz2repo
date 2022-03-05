@@ -32,8 +32,9 @@ const loginWithGoogle = function () {
       const credential = result.credential;
       const token = credential.accessToken;
       const user = result.user.displayName;
-      usuarioActivo = user;
       console.log(user, "on login");
+      usuarioActivo = user;
+      console.log("login con google de ", user);
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -44,16 +45,37 @@ const loginWithGoogle = function () {
     });
 };
 
+async function getUserProfile() {
+  const user = firebase.auth().currentUser;
 
+  if (user !== null) {
+    // The user object has basic properties such as display name, email, etc.
+    const displayName = user.displayName;
+    const email = user.email;
+    const photoURL = user.photoURL;
+    const emailVerified = user.emailVerified;
+
+    // The user's ID, unique to the Firebase project. Do NOT use
+    // this value to authenticate with your backend server, if
+    // you have one. Use User.getIdToken() instead.
+    const uid = user.uid;
+    console.log(displayName);
+    console.log(email);
+    usuarioActivo = displayName;
+    await obtenerPuntuacionUsuario();
+  }
+}
 
 //Escuchador de eventos del usuario
 firebase.auth().onAuthStateChanged((user) => {
-  
   if (user) {
     ocultar(botonLogin);
     mostrar(botonSignOut);
     mostrar(botonComenzar);
-    h1home.innerHTML="Bienvenido "+ usuarioActivo;
+    pintarGrafica();
+    mostrar(grafica);
+
+    h1home.innerHTML = "Bienvenido " + usuarioActivo;
 
     //meter función pintar gráfica
     //boton acceder al quiz
@@ -63,8 +85,9 @@ firebase.auth().onAuthStateChanged((user) => {
   }
 });
 
-//Persistencia sesion (por defecto ya es local)
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+window.addEventListener('DOMContentLoaded', () => {firebase
+  .auth()
+  .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   .then(() => {
     // Existing and future Auth states are now persisted in the current
     // session only. Closing the window would clear any existing state even
@@ -78,10 +101,13 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     var errorCode = error.code;
     var errorMessage = error.message;
   });
+  console.log('DOM fully loaded and parsed');
+});
+
+//Persistencia sesion (por defecto ya es local)
 
 
-
-// Log out 
+// Log out
 function signOut() {
   firebase
     .auth()
@@ -91,30 +117,16 @@ function signOut() {
       mostrar(botonLogin);
       ocultar(botonSignOut);
       ocultar(botonComenzar);
-      h1Home.innerHTML= "¡Bienvenido a nuestro nuevo Quiz!";
+      ocultar(grafica);
+      h1Home.innerHTML = "¡Bienvenido a nuestro nuevo Quiz!";
+      //usuarioActivo = undefined;
     })
     .catch((error) => {
-      console.log("No se pudo cerrar sesión correctamente");
+      console.log("No se pudo  cerrar sesión correctamente");
     });
 }
 
-
 //obetener perfil de usuario
-const user = firebase.auth().currentUser;
-console.log(user);
-if (user !== null) {
-  // The user object has basic properties such as display name, email, etc.
-  const displayName = user.displayName;
-  const email = user.email;
-  const photoURL = user.photoURL;
-  const emailVerified = user.emailVerified;
-
-  // The user's ID, unique to the Firebase project. Do NOT use
-  // this value to authenticate with your backend server, if
-  // you have one. Use User.getIdToken() instead.
-  const uid = user.uid;
-}
-
 
 //Selectores
 const pregunta = document.getElementById("pregunta");
@@ -133,7 +145,8 @@ const botonLogin = document.getElementById("botonLogin");
 const botonSignOut = document.getElementById("botonSignOut");
 const botonComenzar = document.getElementById("comenzar");
 const h1home = document.getElementById("h1Home");
-const userBox =document.getElementById("displayUser");
+const userBox = document.getElementById("displayUser");
+const grafica = document.getElementById("grafica");
 
 //funciones para mostrar y ocultar botones
 function ocultar(element) {
@@ -186,6 +199,7 @@ function barajarOpciones(array) {
 async function ejecucionAsincrona() {
   await buscarPreguntas();
   await pintarPreguntas();
+  await getUserProfile();
 }
 ejecucionAsincrona();
 
@@ -252,12 +266,10 @@ function checkAnswers() {
   }
 }
 
-
-
-function guardarPartida() {
+async function guardarPartida() {
   db.collection("juegos")
     .add({
-      usuario: user, //acceder a valor de usuario logado
+      usuario: usuarioActivo, //acceder a valor de usuario logado
       fecha: Date(),
       puntuacion: partida.filter((pregunta) => pregunta).length,
     })
@@ -279,7 +291,6 @@ botonNext.addEventListener("click", () => {
     !opcion4.checked
   ) {
     alert("Debes seleccionar al menos una opción");
-  
   } else {
     if (k < 10) {
       checkAnswers();
@@ -308,33 +319,63 @@ botonFinalizar.type = "button";
 botonFinalizar.setAttribute("id", "botonSend");
 botonFinalizar.innerText = "Finalizar";
 botonresults.appendChild(botonFinalizar);
+ocultar(botonFinalizar);
 
 botonFinalizar.addEventListener("click", () => {
+  if (
+    !opcion1.checked &&
+    !opcion2.checked &&
+    !opcion3.checked &&
+    !opcion4.checked
+  ) {
+    alert("Debes seleccionar al menos una opción");
+  } else {
+
   checkAnswers();
   unCheckOptions();
   console.log(partida);
   guardarPartida();
-});
+  ocultar(botonFinalizar);
+}});
 
+//******** RECUPERAR DATOS PARA GRAFICA ******** */
 
+const puntuacionUsuario = [];
+const fechasJuegosUsuario = [];
 
-//************GRAFICA ************ */
-
-const games = {
-  // A labels array that can contain any sort of values
-  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-  
-  series: [
-    [5, 2, 4, 2, 0]
-  ]
-};
-
-const settings = {
-  width:300,
-  height:200
+async function obtenerPuntuacionUsuario() {
+  db.collection("juegos")
+    .where("user", "==", usuarioActivo)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        puntuacionUsuario.push(doc.puntuacion);
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+      });
+    })
+    .catch((error) => {
+      console.log("Error getting documents: ", error);
+    });
+  return puntuacionUsuario;
 }
 
-// Create a new line chart object where as first parameter we pass in a selector
-// that is resolving to our chart container element. The Second parameter
-// is the actual data object.
-new Chartist.Line('.ct-chart', games, settings);
+//************GRAFICA ************ */
+function pintarGrafica() {
+  const games = {
+    // A labels array that can contain any sort of values
+    labels: fechasJuegosUsuario,
+
+    series: [[5, 2, 4, 2, 0, 6]],
+  };
+
+  const settings = {
+    width: 300,
+    height: 200,
+  };
+
+  // Create a new line chart object where as first parameter we pass in a selector
+  // that is resolving to our chart container element. The Second parameter
+  // is the actual data object.
+  new Chartist.Line(".ct-chart", games, settings);
+}

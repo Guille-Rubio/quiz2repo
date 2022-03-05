@@ -6,8 +6,10 @@ body {
     overflow:hidden;/*removes scroll bars */ 
 }
 
+
 a{
     text-decoration: none;
+    text-align: center;
 }
 
 #home-header{
@@ -17,9 +19,15 @@ a{
     height:20vh;
   
 }
+
+#body-home{
+    background-color: #d7fbfa;
+}
+
 #bienvenida{
     display:flex;
     flex-direction: column;
+    
 }
 
 .display{
@@ -30,6 +38,10 @@ a{
     visibility:hidden;
 }
 
+.ct-chart{
+    
+}
+
 main{
 display:flex;
 justify-content: center;
@@ -38,15 +50,25 @@ align-content: center;
 margin:0;
 
 }
+
+#main-question{
+    max-height: 590px;
+}
+
 .question {
     display: flex;
     margin: 5px;
     min-height: 10vh;
 }
 
+#section-questions{
+    margin-top: 20px;
+}
+
 h3 {
     margin: auto;
     text-align: center;
+    font-size: 17px;
 }
 
 .options {
@@ -69,6 +91,12 @@ h3 {
     padding:20px;
 
 }
+
+#back-home{
+    font-size: 20px;
+    text-align: center;
+}
+
 
 .card:nth-child(1){
     box-shadow: inset 0px 0px 18px 7px rgba(46,255,171,0.76);
