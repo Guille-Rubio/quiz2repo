@@ -81,13 +81,14 @@ function signOut() {
     .auth()
     .signOut()
     .then(() => {
-      console.log("El usuario ha abandonado la sesión");
+      
       mostrar(botonLogin);
       ocultar(botonSignOut);
       ocultar(botonComenzar);
       ocultar(grafica);
       h1Home.innerHTML = "¡Bienvenido a nuestro nuevo Quiz!";
       localStorage.setItem("usuario", "");
+      console.log("El usuario ha abandonado la sesión");
     })
     .catch((error) => {
       console.log("No se pudo  cerrar sesión correctamente");
