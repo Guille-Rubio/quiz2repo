@@ -29,13 +29,28 @@ const botonComenzar = document.getElementById("comenzar");
 const h1home = document.getElementById("h1Home");
 const userBox = document.getElementById("displayUser");
 const grafica = document.getElementById("grafica");
-const puntuaciones = [];
-const fecha = [];
+
 //********* VARIABLES GLOBALES */
 let preguntas;
 let k = 0; //contador del array de preguntas
 let numPregunta = 1; //contador de número de pregunta mostrada
 const partida = []; //resultado de las respuestas
+const puntuaciones = []; //puntuaciones del usuario para la gráfica
+const fechas = []; //fechas de juegos para la gráfica
+
+/********) funciones auxiliares ******** */
+//funciones para mostrar y ocultar botones
+function ocultar(element) {
+  element.classList.add("display");
+}
+function esconder(element) {
+  //Refactorizar para todos los botones
+  element.classList.add("hidden");
+}
+function mostrar(element) {
+  element.classList.remove("display");
+}
+
 //**************** LOGIN CON GOOGLE ***************** */
 //login con google (pop up)
 const loginWithGoogle = function () {
@@ -51,6 +66,8 @@ const loginWithGoogle = function () {
       console.log(user, "on login");
       localStorage.setItem("usuario", user);
       console.log("login con google de ", user);
+      pintarGrafica();
+      mostrar(grafica);
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -66,8 +83,7 @@ firebase.auth().onAuthStateChanged((user) => {
     ocultar(botonLogin);
     mostrar(botonSignOut);
     mostrar(botonComenzar);
-    pintarGrafica();
-    mostrar(grafica);
+
     h1home.innerHTML = "Bienvenido " + usuarioActivo;
     //meter función pintar gráfica
     //boton acceder al quiz
@@ -81,7 +97,6 @@ function signOut() {
     .auth()
     .signOut()
     .then(() => {
-      
       mostrar(botonLogin);
       ocultar(botonSignOut);
       ocultar(botonComenzar);
@@ -91,21 +106,11 @@ function signOut() {
       console.log("El usuario ha abandonado la sesión");
     })
     .catch((error) => {
+      console.log(error);
       console.log("No se pudo  cerrar sesión correctamente");
     });
 }
-/********) funciones auxiliares ******** */ 
-//funciones para mostrar y ocultar botones
-function ocultar(element) {
-  element.classList.add("display");
-}
-function esconder(element) {
-  //Refactorizar para todos los botones
-  element.classList.add("hidden");
-}
-function mostrar(element) {
-  element.classList.remove("display");
-}
+
 // *************** QUIZ ***********************
 /*leer 10 preguntas random de la api*/
 async function buscarPreguntas() {
@@ -133,14 +138,20 @@ function barajarOpciones(array) {
   }
   return array;
 }
+
+/********** EJECUCION ASINCRONA *********** */
 async function ejecucionAsincrona() {
   await buscarPreguntas();
   await pintarPreguntas();
   await getUserProfile();
 }
 ejecucionAsincrona();
+
+
+
 function pintarNumPregunta() {
-  questionNumber.innerHTML = "question number " + numPregunta;
+  questionNumber.innerHTML =
+    "question number " + numPregunta;
 }
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
@@ -199,10 +210,11 @@ async function guardarPartida() {
     .add({
       usuario: localStorage.getItem("usuario"), //acceder a valor de usuario logado
       fecha: Date().slice(),
-      dia:Date().slice(4,7),
-      mes:Date().slice(4,7),
-      anio:Date().slice(16,24),
-      hora: Date().slice(),
+      dia: Date().slice(8, 10),
+      mes: Date().slice(4, 7),
+      anio: Date().slice(11, 15),
+      hora: Date().slice(16, 24),
+
       puntuacion: partida.filter((pregunta) => pregunta).length,
     })
     .then((docRef) => {
@@ -257,31 +269,38 @@ botonFinalizar.addEventListener("click", () => {
   ) {
     alert("Debes seleccionar al menos una opción");
   } else {
-  checkAnswers();
-  unCheckOptions();
-  console.log(partida);
-  guardarPartida();
-  ocultar(botonFinalizar);
-}});
+    checkAnswers();
+    unCheckOptions();
+    console.log(partida);
+    guardarPartida();
+    ocultar(botonFinalizar);
+  }
+});
 //******** RECUPERAR DATOS PARA GRAFICA ******** */
-function getDatosGrafica(){
-  db.collection("juegos").where("usuario", "==", localStorage.getItem("usuario"))
-  .get()
-  .then((querySnapshot) => {
+function getDatosGrafica() {
+  db.collection("juegos")
+    .where("usuario", "==", localStorage.getItem("usuario"))
+    .get()
+    .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
+        puntuaciones.push(doc.data().puntuacion);
+        fechas.push(doc.data().fecha);
       });
-  })
-  .catch((error) => {
+    })
+    .catch((error) => {
       console.log("Error getting documents: ", error);
-  });
+    });
 }
+
+const arr = [[fecha1, puntuacion1], [fecha2, puntuacion2], etc];
+
+//Juntar fechas orden YYYYMMDDHHMMSS
 //************GRAFICA ************ */
 function pintarGrafica() {
   const games = {
     // A labels array that can contain any sort of values
-    labels: fechasJuegosUsuario,
-    series: [[5, 2, 4, 2, 0, 6]],
+    labels: ["A", "B", "C", "D"],
+    series: [[puntuaciones]],
   };
   const settings = {
     width: 300,

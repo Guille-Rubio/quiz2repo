@@ -38,6 +38,11 @@ align-content: center;
 margin:0;
 
 }
+/* 
+#grafica{
+    margin:50px;
+
+}/ */
 .question {
     display: flex;
     margin: 5px;
