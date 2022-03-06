@@ -7,127 +7,9 @@ let firebaseConfig = {
   messagingSenderId: "466936444764",
   appId: "1:466936444764:web:2e5376aa50a5d2d47fb399",
 };
-
-//const firebase = require("firebase");
-// Required for side-effects
-//require("firebase/firestore");
-
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-//**************** LOGIN CON GOOGLE ***************** */
-
-let usuarioActivo;
-
-//login con google (pop up)
-const loginWithGoogle = function () {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  firebase
-    .auth()
-    .signInWithPopup(provider)
-    .then((result) => {
-      /** @type {firebase.auth.OAuthCredential} */
-      const credential = result.credential;
-      const token = credential.accessToken;
-      const user = result.user.displayName;
-      console.log(user, "on login");
-      usuarioActivo = user;
-      console.log("login con google de ", user);
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.email;
-      const credential = error.credential;
-      console.log(errorMessage);
-    });
-};
-
-async function getUserProfile() {
-  const user = firebase.auth().currentUser;
-
-  if (user !== null) {
-    // The user object has basic properties such as display name, email, etc.
-    const displayName = user.displayName;
-    const email = user.email;
-    const photoURL = user.photoURL;
-    const emailVerified = user.emailVerified;
-
-    // The user's ID, unique to the Firebase project. Do NOT use
-    // this value to authenticate with your backend server, if
-    // you have one. Use User.getIdToken() instead.
-    const uid = user.uid;
-    console.log(displayName);
-    console.log(email);
-    usuarioActivo = displayName;
-    await obtenerPuntuacionUsuario();
-  }
-}
-
-//Escuchador de eventos del usuario
-firebase.auth().onAuthStateChanged((user) => {
-  if (user) {
-    ocultar(botonLogin);
-    mostrar(botonSignOut);
-    mostrar(botonComenzar);
-    pintarGrafica();
-    mostrar(grafica);
-
-    h1home.innerHTML = "Bienvenido " + usuarioActivo;
-
-    //meter función pintar gráfica
-    //boton acceder al quiz
-
-    const uid = user.uid;
-  } else {
-  }
-});
-
-window.addEventListener('DOMContentLoaded', () => {firebase
-  .auth()
-  .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(() => {
-    // Existing and future Auth states are now persisted in the current
-    // session only. Closing the window would clear any existing state even
-    // if a user forgets to sign out.
-    // ...
-    // New sign-in will be persisted with session persistence.
-    return firebase.auth().signInWithEmailAndPassword(email, password);
-  })
-  .catch((error) => {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-  });
-  console.log('DOM fully loaded and parsed');
-});
-
-//Persistencia sesion (por defecto ya es local)
-
-
-// Log out
-function signOut() {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      console.log("El usuario ha abandonado la sesión");
-      mostrar(botonLogin);
-      ocultar(botonSignOut);
-      ocultar(botonComenzar);
-      ocultar(grafica);
-      h1Home.innerHTML = "¡Bienvenido a nuestro nuevo Quiz!";
-      //usuarioActivo = undefined;
-    })
-    .catch((error) => {
-      console.log("No se pudo  cerrar sesión correctamente");
-    });
-}
-
-//obetener perfil de usuario
-
 //Selectores
 const pregunta = document.getElementById("pregunta");
 const opcion1label = document.getElementById("opcion1label");
@@ -147,7 +29,71 @@ const botonComenzar = document.getElementById("comenzar");
 const h1home = document.getElementById("h1Home");
 const userBox = document.getElementById("displayUser");
 const grafica = document.getElementById("grafica");
-
+const puntuaciones = [];
+const fecha = [];
+//********* VARIABLES GLOBALES */
+let preguntas;
+let k = 0; //contador del array de preguntas
+let numPregunta = 1; //contador de número de pregunta mostrada
+const partida = []; //resultado de las respuestas
+//**************** LOGIN CON GOOGLE ***************** */
+//login con google (pop up)
+const loginWithGoogle = function () {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+      /** @type {firebase.auth.OAuthCredential} */
+      const credential = result.credential;
+      const token = credential.accessToken;
+      const user = result.user.displayName;
+      console.log(user, "on login");
+      localStorage.setItem("usuario", user);
+      console.log("login con google de ", user);
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.email;
+      const credential = error.credential;
+      console.log(errorMessage);
+    });
+};
+//Escuchador de eventos del usuario
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    ocultar(botonLogin);
+    mostrar(botonSignOut);
+    mostrar(botonComenzar);
+    pintarGrafica();
+    mostrar(grafica);
+    h1home.innerHTML = "Bienvenido " + usuarioActivo;
+    //meter función pintar gráfica
+    //boton acceder al quiz
+    const uid = user.uid;
+  } else {
+  }
+});
+// Log out
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      console.log("El usuario ha abandonado la sesión");
+      mostrar(botonLogin);
+      ocultar(botonSignOut);
+      ocultar(botonComenzar);
+      ocultar(grafica);
+      h1Home.innerHTML = "¡Bienvenido a nuestro nuevo Quiz!";
+      localStorage.setItem("usuario", "");
+    })
+    .catch((error) => {
+      console.log("No se pudo  cerrar sesión correctamente");
+    });
+}
+/********) funciones auxiliares ******** */ 
 //funciones para mostrar y ocultar botones
 function ocultar(element) {
   element.classList.add("display");
@@ -159,15 +105,7 @@ function esconder(element) {
 function mostrar(element) {
   element.classList.remove("display");
 }
-
-//********* VARIABLES GLOBALES */
-
-let preguntas;
-let k = 0; //contador del array de preguntas
-let numPregunta = 1; //contador de número de pregunta mostrada
-
 // *************** QUIZ ***********************
-
 /*leer 10 preguntas random de la api*/
 async function buscarPreguntas() {
   try {
@@ -181,7 +119,6 @@ async function buscarPreguntas() {
     console.log(`ERROR: ${error.stack}`);
   }
 }
-
 function barajarOpciones(array) {
   let currentIndex = array.length,
     randomIndex;
@@ -195,23 +132,17 @@ function barajarOpciones(array) {
   }
   return array;
 }
-
 async function ejecucionAsincrona() {
   await buscarPreguntas();
   await pintarPreguntas();
   await getUserProfile();
 }
 ejecucionAsincrona();
-
-const partida = []; //resultado de las respuestas
-
 function pintarNumPregunta() {
   questionNumber.innerHTML = "question number " + numPregunta;
 }
-
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
-
   let opciones = [
     preguntas[k].incorrect_answers[0],
     preguntas[k].incorrect_answers[1],
@@ -219,7 +150,6 @@ async function pintarPreguntas() {
     preguntas[k].correct_answer,
   ];
   opciones = barajarOpciones(opciones);
-
   opcion1label.innerHTML = opciones[0];
   opcion1.setAttribute("value", opciones[0]);
   opcion2label.innerHTML = opciones[1];
@@ -230,14 +160,12 @@ async function pintarPreguntas() {
   opcion4.setAttribute("value", opciones[3]);
   pintarNumPregunta();
 }
-
 function unCheckOptions() {
   opcion1.checked = false;
   opcion2.checked = false;
   opcion3.checked = false;
   opcion4.checked = false;
 }
-
 function checkAnswers() {
   if (opcion1.checked) {
     if (opcion1.value == preguntas[k].correct_answer) {
@@ -265,12 +193,15 @@ function checkAnswers() {
     }
   }
 }
-
 async function guardarPartida() {
   db.collection("juegos")
     .add({
-      usuario: usuarioActivo, //acceder a valor de usuario logado
-      fecha: Date(),
+      usuario: localStorage.getItem("usuario"), //acceder a valor de usuario logado
+      fecha: Date().slice(),
+      dia:Date().slice(4,7),
+      mes:Date().slice(4,7),
+      anio:Date().slice(16,24),
+      hora: Date().slice(),
       puntuacion: partida.filter((pregunta) => pregunta).length,
     })
     .then((docRef) => {
@@ -280,9 +211,7 @@ async function guardarPartida() {
       console.error("Error adding document: ", error);
     });
 }
-
 //********** BOTON NEXT  ************/
-
 botonNext.addEventListener("click", () => {
   if (
     !opcion1.checked &&
@@ -303,7 +232,6 @@ botonNext.addEventListener("click", () => {
       }
       console.log("valor k " + k);
       console.log("partida", partida);
-
       //console.log(preguntas.results);
     }
     if (k === 9) {
@@ -312,7 +240,6 @@ botonNext.addEventListener("click", () => {
     }
   }
 });
-
 /*************** BOTON FINALIZAR ******************/
 const botonFinalizar = document.createElement("button");
 botonFinalizar.type = "button";
@@ -320,7 +247,6 @@ botonFinalizar.setAttribute("id", "botonSend");
 botonFinalizar.innerText = "Finalizar";
 botonresults.appendChild(botonFinalizar);
 ocultar(botonFinalizar);
-
 botonFinalizar.addEventListener("click", () => {
   if (
     !opcion1.checked &&
@@ -330,50 +256,36 @@ botonFinalizar.addEventListener("click", () => {
   ) {
     alert("Debes seleccionar al menos una opción");
   } else {
-
   checkAnswers();
   unCheckOptions();
   console.log(partida);
   guardarPartida();
   ocultar(botonFinalizar);
 }});
-
 //******** RECUPERAR DATOS PARA GRAFICA ******** */
-
-const puntuacionUsuario = [];
-const fechasJuegosUsuario = [];
-
-async function obtenerPuntuacionUsuario() {
-  db.collection("juegos")
-    .where("user", "==", usuarioActivo)
-    .get()
-    .then((querySnapshot) => {
+function getDatosGrafica(){
+  db.collection("juegos").where("usuario", "==", localStorage.getItem("usuario"))
+  .get()
+  .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        puntuacionUsuario.push(doc.puntuacion);
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
+          console.log(doc.id, " => ", doc.data());
       });
-    })
-    .catch((error) => {
+  })
+  .catch((error) => {
       console.log("Error getting documents: ", error);
-    });
-  return puntuacionUsuario;
+  });
 }
-
 //************GRAFICA ************ */
 function pintarGrafica() {
   const games = {
     // A labels array that can contain any sort of values
     labels: fechasJuegosUsuario,
-
     series: [[5, 2, 4, 2, 0, 6]],
   };
-
   const settings = {
     width: 300,
     height: 200,
   };
-
   // Create a new line chart object where as first parameter we pass in a selector
   // that is resolving to our chart container element. The Second parameter
   // is the actual data object.
