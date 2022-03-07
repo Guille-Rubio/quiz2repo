@@ -51,6 +51,50 @@ function mostrar(element) {
   element.classList.remove("display");
 }
 
+function mesLetraANumero(mes) {
+  switch (mes) {
+    case "Jan":
+      mes = "01";
+      break;
+    case "Feb":
+      mes = "02";
+      break;
+    case "Mar":
+      mes = "03";
+      break;
+    case "Apr":
+      mes = "04";
+      break;
+    case "May":
+      mes = "05";
+      break;
+    case "Jun":
+      mes = "06";
+      break;
+    case "Jul":
+      mes = "07";
+      break;
+    case "Aug":
+      mes = "08";
+      break;
+    case "Sep":
+      mes = "09";
+      break;
+    case "Oct":
+      mes = "10";
+      break;
+    case "Nov":
+      mes = "11";
+      break;
+    case "Dec":
+      mes = "12";
+      break;
+    default:
+      console.log(`Mes incorrecto`);
+  }
+  return mes;
+}
+
 //**************** LOGIN CON GOOGLE ***************** */
 //login con google (pop up)
 const loginWithGoogle = function () {
@@ -147,11 +191,8 @@ async function ejecucionAsincrona() {
 }
 ejecucionAsincrona();
 
-
-
 function pintarNumPregunta() {
-  questionNumber.innerHTML =
-    "question number " + numPregunta;
+  questionNumber.innerHTML = "question number " + numPregunta;
 }
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
@@ -209,12 +250,7 @@ async function guardarPartida() {
   db.collection("juegos")
     .add({
       usuario: localStorage.getItem("usuario"), //acceder a valor de usuario logado
-      fecha: Date().slice(),
-      dia: Date().slice(8, 10),
-      mes: Date().slice(4, 7),
-      anio: Date().slice(11, 15),
-      hora: Date().slice(16, 24),
-
+      fecha: Date(),
       puntuacion: partida.filter((pregunta) => pregunta).length,
     })
     .then((docRef) => {
@@ -292,7 +328,34 @@ function getDatosGrafica() {
     });
 }
 
-const arr = [[fecha1, puntuacion1], [fecha2, puntuacion2], etc];
+
+
+function procesarDatosParaGrafica() {
+  const datos=[];
+  const arr = [];
+  let fechasString = fechas.map((fecha) => {
+    let anio = fecha.slice(11, 15);
+    let mes = mesLetraANumero(fecha.slice(4, 7));
+    let dia = fecha.slice(8, 10);
+    let hora = fecha.slice(16, 18);
+    let minutos = fecha.slice(19, 21);
+    let segundos = fecha.slice(22, 24);
+    fecha = anio + mes + dia + hora + minutos + segundos;
+    arr.push(fecha);
+  });
+  
+  for (let i = 0; i < fechasString.length; i++) {
+    let juego = [];
+    juego.push(arr[i]);
+    juego.push(puntuaciones[i]);
+    datos.push(juego); 
+  }
+  return datos;
+}
+
+
+
+
 
 //Juntar fechas orden YYYYMMDDHHMMSS
 //************GRAFICA ************ */
