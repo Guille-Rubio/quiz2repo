@@ -328,10 +328,8 @@ function getDatosGrafica() {
     });
 }
 
-
-
 function procesarDatosParaGrafica() {
-  const datos=[];
+  const datos = [];
   const arr = [];
   let fechasString = fechas.map((fecha) => {
     let anio = fecha.slice(11, 15);
@@ -343,27 +341,41 @@ function procesarDatosParaGrafica() {
     fecha = anio + mes + dia + hora + minutos + segundos;
     arr.push(fecha);
   });
-  
+
   for (let i = 0; i < fechasString.length; i++) {
     let juego = [];
     juego.push(arr[i]);
     juego.push(puntuaciones[i]);
-    datos.push(juego); 
+    datos.push(juego);
   }
+  datos.sort();
+
   return datos;
 }
-
-
-
-
 
 //Juntar fechas orden YYYYMMDDHHMMSS
 //************GRAFICA ************ */
 function pintarGrafica() {
+  getDatosGrafica();
+  let data = procesarDatosParaGrafica();
+  console.log(data)
+  let fechasgrafica = [];
+  for (let i = 0; i < data.length; i++) {
+    fechasgrafica.push(data[i][0]);
+  }
+
+  let puntosgrafica = [];
+  for (let i = 0; i < data.length; i++) {
+    puntosgrafica.push(data[i][0]);
+  }
+
+  console.log(fechasgrafica);
+  console.log(puntosgrafica);
+
   const games = {
     // A labels array that can contain any sort of values
-    labels: ["A", "B", "C", "D"],
-    series: [[puntuaciones]],
+    labels: fechas,
+    series: [puntosgrafica],
   };
   const settings = {
     width: 300,
