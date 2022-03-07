@@ -38,11 +38,16 @@ align-content: center;
 margin:0;
 
 }
-/* 
+ 
 #grafica{
-    margin:50px;
+    margin-top:75px;
+    width:60vw;
+    height:50vh;
+    border: 1px solid red;
+    padding: 15px;
 
-}/ */
+
+}
 .question {
     display: flex;
     margin: 5px;

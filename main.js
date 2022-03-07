@@ -145,6 +145,7 @@ function signOut() {
       ocultar(botonSignOut);
       ocultar(botonComenzar);
       ocultar(grafica);
+
       h1Home.innerHTML = "¡Bienvenido a nuestro nuevo Quiz!";
       localStorage.setItem("usuario", "");
       console.log("El usuario ha abandonado la sesión");
@@ -349,16 +350,30 @@ function procesarDatosParaGrafica() {
     datos.push(juego);
   }
   datos.sort();
-
   return datos;
 }
 
 //Juntar fechas orden YYYYMMDDHHMMSS
+
+function fechasBonitas(arr) {
+  arr2 = [];
+  const fechasgrafica = arr.map((fecha) => {
+    let mes = fecha.slice(4, 6);
+    let dia = fecha.slice(6, 8);
+    let hora = fecha.slice(8, 10);
+    let min = fecha.slice(10, 12);
+    fecha = dia + "/" + mes +"-"+ hora + ":" + min;
+    arr2.push(fecha);
+  });
+  return arr2;
+}
+
 //************GRAFICA ************ */
 function pintarGrafica() {
   getDatosGrafica();
   let data = procesarDatosParaGrafica();
-  console.log(data)
+  console.log(data);
+
   let fechasgrafica = [];
   for (let i = 0; i < data.length; i++) {
     fechasgrafica.push(data[i][0]);
@@ -366,23 +381,71 @@ function pintarGrafica() {
 
   let puntosgrafica = [];
   for (let i = 0; i < data.length; i++) {
-    puntosgrafica.push(data[i][0]);
+    puntosgrafica.push(data[i][1]);
   }
+  console.log(fechasBonitas(fechasgrafica));
 
-  console.log(fechasgrafica);
   console.log(puntosgrafica);
 
   const games = {
     // A labels array that can contain any sort of values
-    labels: fechas,
+
+    labels: fechasBonitas(fechasgrafica),
     series: [puntosgrafica],
   };
+
+  const game2 = {
+  lineSmooth: Chartist.Interpolation.simple({
+    divisor: 2,
+    fillHoles: false
+  })
+}
+
   const settings = {
-    width: 300,
-    height: 200,
+    axisY: {
+      high: 10,
+      low: 0,
+      onlyInteger: true,
+    },
+    axisX: {
+      seriesBarDistance: 1,
+      scaleMinSpace: 10,
+      offset:45,
+
+    },
   };
+  /*
+  var responsiveOptions = [
+    [
+      "screen and (min-width: 425px) and (max-width: 1024px)",
+      {
+        seriesBarDistance: 10,
+        axisX: {
+          labelInterpolationFnc: function (value) {
+            return value;
+          },
+        },
+      },
+    ],
+    [
+      "screen and (max-width: 425px)",
+      {
+        seriesBarDistance: 5,
+        axisX: {
+          labelInterpolationFnc: function (value) {
+            return value[0];
+          },
+        },
+      },
+    ],
+  ];
+  */
   // Create a new line chart object where as first parameter we pass in a selector
   // that is resolving to our chart container element. The Second parameter
   // is the actual data object.
-  new Chartist.Line(".ct-chart", games, settings);
+  new Chartist.Line(".ct-chart", games, settings, game2);
 }
+
+getDatosGrafica();
+procesarDatosParaGrafica();
+pintarGrafica();
