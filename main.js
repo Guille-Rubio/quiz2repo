@@ -35,6 +35,7 @@ let preguntas;
 let k = 0; //contador del array de preguntas
 let numPregunta = 1; //contador de número de pregunta mostrada
 const partida = []; //resultado de las respuestas
+const results = "./results.html";
 
 /********) funciones auxiliares ******** */
 //funciones para mostrar y ocultar botones
@@ -93,6 +94,19 @@ function mesLetraANumero(mes) {
   return mes;
 }
 
+function fechasBonitas(arr) {
+  arr2 = [];
+  const fechasgrafica = arr.map((fecha) => {
+    let mes = fecha.slice(4, 6);
+    let dia = fecha.slice(6, 8);
+    let hora = fecha.slice(8, 10);
+    let min = fecha.slice(10, 12);
+    fecha = dia + "/" + mes + "-" + hora + ":" + min;
+    arr2.push(fecha);
+  });
+  return arr2;
+}
+
 //**************** LOGIN CON GOOGLE ***************** */
 //login con google (pop up)
 const loginWithGoogle = function () {
@@ -108,7 +122,7 @@ const loginWithGoogle = function () {
       console.log(user, "on login");
       localStorage.setItem("usuario", user);
       console.log("login con google de ", user);
-      getDatosGrafica();
+      pintarGrafica();
       mostrar(grafica);
     })
     .catch((error) => {
@@ -125,6 +139,7 @@ firebase.auth().onAuthStateChanged((user) => {
     ocultar(botonLogin);
     mostrar(botonSignOut);
     mostrar(botonComenzar);
+    window.onload(pintarGrafica());
 
     h1home.innerHTML = "Bienvenido " + usuarioActivo;
     //meter función pintar gráfica
@@ -309,10 +324,11 @@ botonFinalizar.addEventListener("click", () => {
     console.log(partida);
     guardarPartida();
     ocultar(botonFinalizar);
+    window.location = results;
   }
 });
 //******** RECUPERAR DATOS PARA GRAFICA ******** */
-async function getDatosGrafica() {
+async function pintarGrafica() {
   let puntuaciones = []; //puntuaciones del usuario para la gráfica
   let fechas = []; //fechas de juegos para la gráfica
 
@@ -400,43 +416,8 @@ async function getDatosGrafica() {
     });
 }
 
-// function procesarDatosParaGrafica() {
-//   const datos = [];
-//   const arr = [];
-//   let fechasString = fechas.map((fecha) => {
-//     let anio = fecha.slice(11, 15);
-//     let mes = mesLetraANumero(fecha.slice(4, 7));
-//     let dia = fecha.slice(8, 10);
-//     let hora = fecha.slice(16, 18);
-//     let minutos = fecha.slice(19, 21);
-//     let segundos = fecha.slice(22, 24);
-//     fecha = anio + mes + dia + hora + minutos + segundos;
-//     arr.push(fecha);
-//   });
+//************* RESULTS ************/
 
-//   for (let i = 0; i < fechasString.length; i++) {
-//     let juego = [];
-//     juego.push(arr[i]);
-//     juego.push(puntuaciones[i]);
-//     datos.push(juego);
-//   }
-//   datos.sort();
-//   return datos;
-// }
 
-//Juntar fechas orden YYYYMMDDHHMMSS
 
-function fechasBonitas(arr) {
-  arr2 = [];
-  const fechasgrafica = arr.map((fecha) => {
-    let mes = fecha.slice(4, 6);
-    let dia = fecha.slice(6, 8);
-    let hora = fecha.slice(8, 10);
-    let min = fecha.slice(10, 12);
-    fecha = dia + "/" + mes + "-" + hora + ":" + min;
-    arr2.push(fecha);
-  });
-  return arr2;
-}
-
-//************GRAFICA ************ */
+partida.filter((pregunta) => pregunta).length
