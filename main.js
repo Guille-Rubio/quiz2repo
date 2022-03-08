@@ -35,8 +35,6 @@ let preguntas;
 let k = 0; //contador del array de preguntas
 let numPregunta = 1; //contador de número de pregunta mostrada
 const partida = []; //resultado de las respuestas
-const puntuaciones = []; //puntuaciones del usuario para la gráfica
-const fechas = []; //fechas de juegos para la gráfica
 
 /********) funciones auxiliares ******** */
 //funciones para mostrar y ocultar botones
@@ -110,7 +108,7 @@ const loginWithGoogle = function () {
       console.log(user, "on login");
       localStorage.setItem("usuario", user);
       console.log("login con google de ", user);
-      pintarGrafica();
+      getDatosGrafica();
       mostrar(grafica);
     })
     .catch((error) => {
@@ -314,44 +312,117 @@ botonFinalizar.addEventListener("click", () => {
   }
 });
 //******** RECUPERAR DATOS PARA GRAFICA ******** */
-function getDatosGrafica() {
+async function getDatosGrafica() {
+  let puntuaciones = []; //puntuaciones del usuario para la gráfica
+  let fechas = []; //fechas de juegos para la gráfica
+
   db.collection("juegos")
     .where("usuario", "==", localStorage.getItem("usuario"))
     .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
+    .then(async function (querySnapshot) {
+      querySnapshot.forEach(async function (doc) {
         puntuaciones.push(doc.data().puntuacion);
         fechas.push(doc.data().fecha);
       });
     })
+
+    .then(() => {
+      let datos = [];
+      let arr = [];
+      let fechasString = fechas.map((fecha) => {
+        let anio = fecha.slice(11, 15);
+        let mes = mesLetraANumero(fecha.slice(4, 7));
+        let dia = fecha.slice(8, 10);
+        let hora = fecha.slice(16, 18);
+        let minutos = fecha.slice(19, 21);
+        let segundos = fecha.slice(22, 24);
+        fecha = anio + mes + dia + hora + minutos + segundos;
+        arr.push(fecha);
+      });
+
+      for (let i = 0; i < fechasString.length; i++) {
+        let juego = [];
+        juego.push(arr[i]);
+        juego.push(puntuaciones[i]);
+        datos.push(juego);
+      }
+      datos = datos.sort();
+      console.log(datos);
+      return datos;
+    })
+
+    .then((datos) => {
+      let fechasgrafica = [];
+      for (let i = 0; i < datos.length; i++) {
+        fechasgrafica.push(datos[i][0]);
+      }
+
+      let puntosgrafica = [];
+      for (let i = 0; i < datos.length; i++) {
+        puntosgrafica.push(datos[i][1]);
+      }
+      console.log(fechasBonitas(fechasgrafica));
+
+      console.log(puntosgrafica);
+
+      const games = {
+        // A labels array that can contain any sort of values
+
+        labels: fechasBonitas(fechasgrafica),
+        series: [puntosgrafica],
+      };
+
+      const game2 = {
+        lineSmooth: Chartist.Interpolation.simple({
+          divisor: 2,
+          fillHoles: false,
+        }),
+      };
+
+      const settings = {
+        axisY: {
+          high: 10,
+          low: 0,
+          onlyInteger: true,
+        },
+        axisX: {
+          seriesBarDistance: 1,
+          scaleMinSpace: 10,
+          offset: 45,
+        },
+      };
+
+      new Chartist.Line(".ct-chart", games, settings, game2);
+    })
+
     .catch((error) => {
       console.log("Error getting documents: ", error);
     });
 }
 
-function procesarDatosParaGrafica() {
-  const datos = [];
-  const arr = [];
-  let fechasString = fechas.map((fecha) => {
-    let anio = fecha.slice(11, 15);
-    let mes = mesLetraANumero(fecha.slice(4, 7));
-    let dia = fecha.slice(8, 10);
-    let hora = fecha.slice(16, 18);
-    let minutos = fecha.slice(19, 21);
-    let segundos = fecha.slice(22, 24);
-    fecha = anio + mes + dia + hora + minutos + segundos;
-    arr.push(fecha);
-  });
+// function procesarDatosParaGrafica() {
+//   const datos = [];
+//   const arr = [];
+//   let fechasString = fechas.map((fecha) => {
+//     let anio = fecha.slice(11, 15);
+//     let mes = mesLetraANumero(fecha.slice(4, 7));
+//     let dia = fecha.slice(8, 10);
+//     let hora = fecha.slice(16, 18);
+//     let minutos = fecha.slice(19, 21);
+//     let segundos = fecha.slice(22, 24);
+//     fecha = anio + mes + dia + hora + minutos + segundos;
+//     arr.push(fecha);
+//   });
 
-  for (let i = 0; i < fechasString.length; i++) {
-    let juego = [];
-    juego.push(arr[i]);
-    juego.push(puntuaciones[i]);
-    datos.push(juego);
-  }
-  datos.sort();
-  return datos;
-}
+//   for (let i = 0; i < fechasString.length; i++) {
+//     let juego = [];
+//     juego.push(arr[i]);
+//     juego.push(puntuaciones[i]);
+//     datos.push(juego);
+//   }
+//   datos.sort();
+//   return datos;
+// }
 
 //Juntar fechas orden YYYYMMDDHHMMSS
 
@@ -362,90 +433,10 @@ function fechasBonitas(arr) {
     let dia = fecha.slice(6, 8);
     let hora = fecha.slice(8, 10);
     let min = fecha.slice(10, 12);
-    fecha = dia + "/" + mes +"-"+ hora + ":" + min;
+    fecha = dia + "/" + mes + "-" + hora + ":" + min;
     arr2.push(fecha);
   });
   return arr2;
 }
 
 //************GRAFICA ************ */
-function pintarGrafica() {
-  getDatosGrafica();
-  let data = procesarDatosParaGrafica();
-  console.log(data);
-
-  let fechasgrafica = [];
-  for (let i = 0; i < data.length; i++) {
-    fechasgrafica.push(data[i][0]);
-  }
-
-  let puntosgrafica = [];
-  for (let i = 0; i < data.length; i++) {
-    puntosgrafica.push(data[i][1]);
-  }
-  console.log(fechasBonitas(fechasgrafica));
-
-  console.log(puntosgrafica);
-
-  const games = {
-    // A labels array that can contain any sort of values
-
-    labels: fechasBonitas(fechasgrafica),
-    series: [puntosgrafica],
-  };
-
-  const game2 = {
-  lineSmooth: Chartist.Interpolation.simple({
-    divisor: 2,
-    fillHoles: false
-  })
-}
-
-  const settings = {
-    axisY: {
-      high: 10,
-      low: 0,
-      onlyInteger: true,
-    },
-    axisX: {
-      seriesBarDistance: 1,
-      scaleMinSpace: 10,
-      offset:45,
-
-    },
-  };
-  /*
-  var responsiveOptions = [
-    [
-      "screen and (min-width: 425px) and (max-width: 1024px)",
-      {
-        seriesBarDistance: 10,
-        axisX: {
-          labelInterpolationFnc: function (value) {
-            return value;
-          },
-        },
-      },
-    ],
-    [
-      "screen and (max-width: 425px)",
-      {
-        seriesBarDistance: 5,
-        axisX: {
-          labelInterpolationFnc: function (value) {
-            return value[0];
-          },
-        },
-      },
-    ],
-  ];
-  */
-  // Create a new line chart object where as first parameter we pass in a selector
-  // that is resolving to our chart container element. The Second parameter
-  // is the actual data object.
-  new Chartist.Line(".ct-chart", games, settings, game2);
-}
-
-getDatosGrafica();
-procesarDatosParaGrafica();
-pintarGrafica();
