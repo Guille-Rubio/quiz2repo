@@ -139,10 +139,7 @@ const loginWithGoogle = function () {
     .signInWithPopup(provider)
     .then((result) => {
       /** @type {firebase.auth.OAuthCredential} */
-      const credential = result.credential;
-      const token = credential.accessToken;
       const user = result.user.displayName;
-      console.log(user, "on login");
       localStorage.setItem("usuario", user);
       console.log("login con google de ", user);
       pintarGrafica();
@@ -331,13 +328,6 @@ if (botonNext != null) {
   });
 }
 /*************** BOTON FINALIZAR ******************/
-/* const botonFinalizar = document.createElement("button");
-botonFinalizar.type = "button";
-botonFinalizar.setAttribute("id", "botonSend");
-botonFinalizar.innerText = "Finalizar";
-botonresults.appendChild(botonFinalizar); */
-// mostrar(butonSend)
-// ocultar(botonFinalizar);
 if (botonFinalizar != null) {
   botonFinalizar.addEventListener("click", () => {
     if (
@@ -398,7 +388,6 @@ async function pintarGrafica() {
         datos.push(juego);
       }
       datos = datos.sort();
-      console.log(datos);
       return datos;
     })
 
@@ -492,8 +481,6 @@ if (contenedorPuntuacion != null) {
 }
 
 /********* RANKING **********/
-
-//usuario y puntuacion
 
 const userRank = [];
 const puntosRank = [];
