@@ -449,7 +449,7 @@ async function pintarGrafica() {
 if (contenedorPuntuacion != null) {
   //CONDICION ESTAR EN PAGINA RESULTS
   const botonVolverAJugar = document.getElementById("volverAJugar");
-  const resultJugador = document.getElementById("resultJugador")
+  const resultJugador = document.getElementById("resultJugador");
 
   resultJugador.innerHTML = "Felicidades " + localStorage.getItem("usuario");
 
@@ -481,6 +481,49 @@ if (contenedorPuntuacion != null) {
     }
   }
   pintarResultados();
+  pintarRanking();
 }
 
 /********* RANKING **********/
+
+//usuario y puntuacion
+
+const userRank = [];
+const puntosRank = [];
+
+function pintarRanking() {
+  db.collection("juegos")
+    .orderBy("puntuacion", "desc")
+    .limit(10)
+    .get()
+    .then(async function (querySnapshot) {
+      querySnapshot.forEach(async function (doc) {
+        puntosRank.push(doc.data().puntuacion);
+        userRank.push(doc.data().usuario);
+      });
+
+      console.log(userRank);
+      console.log(puntosRank);
+    })
+    .then(() => {
+      let rank = document.getElementsByClassName("rank");
+      for (let i = 0; i < rank.length; i++) {
+        let position = (rank[i].innerHTML = `Puesto ${i+1} ${userRank[i]} : ${puntosRank[i]} puntos`);
+      }
+    });
+}
+
+// async function guardarPartida() {
+//   db.collection("juegos")
+//     .add({
+//       usuario: localStorage.getItem("usuario"), //acceder a valor de usuario logado
+//       fecha: Date(),
+//       puntuacion: partida.filter((pregunta) => pregunta).length,
+//     })
+//     .then((docRef) => {
+//       console.log("Document written with ID: ", docRef.id);
+//     })
+//     .catch((error) => {
+//       console.error("Error adding document: ", error);
+//     });
+// }
