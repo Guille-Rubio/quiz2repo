@@ -31,15 +31,13 @@ const userBox = document.getElementById("displayUser");
 const grafica = document.getElementById("grafica");
 const botonFinalizar = document.getElementById("buttonSend");
 
-
 //********* VARIABLES GLOBALES */
 let preguntas;
 let k = 0; //contador del array de preguntas
 let numPregunta = 1; //contador de número de pregunta mostrada
 const partida = []; //resultado de las respuestas
 const results = "./results.html";
-
-
+const respuestasCorrectas = [];
 
 /********) funciones auxiliares ******** */
 //funciones para mostrar y ocultar botones
@@ -280,8 +278,6 @@ function checkAnswers() {
   }
 }
 
-
-
 async function guardarPartida() {
   db.collection("juegos")
     .add({
@@ -350,8 +346,11 @@ if (botonFinalizar != null) {
       console.log(partida);
       guardarPartida();
       ocultar(botonFinalizar);
+      for (let i = 0; i < preguntas.length; i++) {
+        respuestasCorrectas.push(preguntas[i].correct_answer);
+      }
       sessionStorage.setItem("partida", JSON.stringify(partida));
-      //sessionStorage.setITem("correctas",JSON.stringify(partida))
+      sessionStorage.setItem("correctas", JSON.stringify(respuestasCorrectas));
       window.location = results;
     }
   });
@@ -448,27 +447,40 @@ async function pintarGrafica() {
 //************* RESULTS ************/
 
 if (contenedorPuntuacion != null) {
+  //CONDICION ESTAR EN PAGINA RESULTS
+  const botonVolverAJugar = document.getElementById("volverAJugar");
+  const resultJugador = document.getElementById("resultJugador")
+
+  resultJugador.innerHTML = "Felicidades " + localStorage.getItem("usuario");
+
   function pintarPuntuacionFinal() {
-    const jugada = JSON.parse(sessionStorage.getItem("partida"));
     const contenedorPuntuacion = document.getElementById(
       "contenedorPuntuacion"
     );
+    const jugada = JSON.parse(sessionStorage.getItem("partida"));
+
     let puntuacionFinal = jugada.filter((pregunta) => pregunta).length;
     contenedorPuntuacion.innerHTML = `Tu puntuacion final es ${puntuacionFinal}/10`;
   }
-}
 
-pintarPuntuacionFinal();
+  pintarPuntuacionFinal();
 
-function pintarResultados() {
-  const resultados = sessionStorage.getItem("correctas")
-  for (k = 0; k < partida.length; k++) {
-    let respuesta = document.getElementsByTagName("p")[k];
-    let correcta = preguntas[k].correct_answer;
-    if (partida[k] == true) {
-      respuesta.innerHTML = "Pregunta" + k + "acertada";
-    } else {
-      respuesta.innerHTML = "La respuesta correcta era " + correcta;
+  function pintarResultados() {
+    const correctas = JSON.parse(sessionStorage.getItem("correctas"));
+    const partida = JSON.parse(sessionStorage.getItem("partida"));
+    console.log(correctas);
+    for (k = 0; k < correctas.length; k++) {
+      let respuesta = document.getElementsByTagName("p")[k];
+      let correcta = correctas[k];
+      console.log(correcta);
+      if (partida[k] == true) {
+        respuesta.innerHTML = "Pregunta " + (k + 1) + " acertada";
+      } else {
+        respuesta.innerHTML = "La respuesta correcta era " + correcta;
+      }
     }
   }
+  pintarResultados();
 }
+
+/********* RANKING **********/
