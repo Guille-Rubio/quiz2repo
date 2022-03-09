@@ -14,14 +14,8 @@
       href="/media/bg/quesito.png"
       type="image/x-icon"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;600;700&display=swap" rel="stylesheet"/>
     
-   
-    
-   
   </head>
 
   <body id="body-home">
@@ -29,13 +23,28 @@
         <section id="bienvenida">
             <h1 id="h1Home">¡Bienvenido a nuestro nuevo Quiz!</h1>
             <p>Pon a prueba tus conocimientos con nuestro QUIZ</p>
-            <button onclick="loginWithGoogle()" id="botonLogin">Accede con Google</button>
-            <a href="/pages/question.html" id="comenzar" class="display">Comenzar el quiz</a>
-            <button onclick="signOut()" id="botonSignOut" class="display">Sign Out</button>
+            <!-- <button onclick="loginWithGoogle()" id="botonLogin">Accede con Google</button>
+            
+            <div id="contenedorComenzar">
+              <div><a href="/pages/question.html" id="comenzar" class="display">Comenzar el quiz</a>
+              </div>
+            <div>
+
+            <button onclick="signOut()" id="botonSignOut" class="display">Sign Out</button> -->
+
+          <section id="contenedorComenzar">
+
+            <button id="comenzar" onclick="goToQuiz()">Comenzar el quiz</button>
+
+            <button id="botonLogin" onclick="loginWithGoogle()" class="display">Sign in</button>
+
+            <button id="botonSignOut" onclick="signOut()"class="display">Sign out</button>
+          
+          </section>
+    
+
            
         </section> 
-
-        
 
     </header>
     
@@ -43,8 +52,6 @@
   
       <div id="grafica" class="ct-chart"></div>
      
-
-
     </main>
 
     <footer>

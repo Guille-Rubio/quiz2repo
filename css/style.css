@@ -11,6 +11,7 @@ body {
     font-size: 1.7vh;
 }
 
+
 a{
     text-decoration: none;
 }
@@ -20,8 +21,8 @@ a{
     align-items: center;
     justify-content: center;
     height:20vh;
-  
 }
+
 #bienvenida{
     display:flex;
     flex-direction: column;
@@ -41,7 +42,6 @@ justify-content: center;
 align-items: center;
 align-content: center;
 margin:0;
-
 }
  
 #grafica{
@@ -50,9 +50,8 @@ margin:0;
     height:50vh;
     border: 1px solid red;
     padding: 15px;
-
-
 }
+
 .question {
     display: flex;
     margin: 5px;
@@ -69,8 +68,7 @@ h3 {
     flex-wrap: wrap;
     justify-content: center;
     margin: auto;
-    height: 70vh;
-    
+    height: 70vh;  
 }
 
 .card {
@@ -82,7 +80,6 @@ h3 {
     margin: 15px;
     border-radius:15px;
     padding:20px;
-
 }
 
 .card:nth-child(1){
@@ -139,13 +136,13 @@ label {
     border-radius: 6px;
 }
 
-#next,#buttonSend,#volverAJugar {
+button {
     display:inline-block;
     height: 30px;
     width: 100px;
     border: 2px solid black;
-    width: 150px;
-    height: 50px;
+    width: 200px;
+    height: 4vh;
     cursor: pointer;
     background: #6dd6d1;
     border: none;
@@ -154,18 +151,37 @@ label {
     font-family: 'Comfortaa', cursive;
     font-weight: 600;
     color: white;
-    font-size: 20px;
-    transition: 500ms;  
+    font-size: 1.7vh;
+    transition: 500ms; 
+    margin:10px; 
 }
 
-#next:hover, #buttonSend:hover, #volverAJugar {
+button:hover{
     border: 2px solid #6dd6d1;
     animation: hueRotation 2s linear infinite;
 }
 
+#contenedorComenzar{
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items:center;
+    width:60%;
+    margin:auto;
+}
+
+#quizfoot{
+    margin:auto;
+    height:20px;
+    display:flex;
+    justify-content: center;
+    align-items:center;  
+}
 
 
-
+#contenedorPuntuacion{
+    font-size: 16px;
+}
 
 @keyframes hueRotation {
     to {

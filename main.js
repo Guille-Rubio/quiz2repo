@@ -62,6 +62,16 @@ function meter(element) {
     element.classList.remove("hidden");
   }
 }
+function goToQuiz(){
+  window.location="./pages/question.html";
+}
+
+function goBackHome(){
+  if (confirm("¿Estás seguro de querer salir? Se perderá el progreso.")) {
+    window.location="/home.html"
+  } else {
+  } 
+}
 
 function mesLetraANumero(mes) {
   switch (mes) {
@@ -153,10 +163,7 @@ firebase.auth().onAuthStateChanged((user) => {
     mostrar(botonSignOut);
     mostrar(botonComenzar);
     window.onload = pintarGrafica();
-
-    //h1home.innerHTML = "Bienvenido " + usuarioActivo;
-    //meter función pintar gráfica
-    //boton acceder al quiz
+   
     const uid = user.uid;
   } else {
   }
@@ -508,22 +515,8 @@ function pintarRanking() {
     .then(() => {
       let rank = document.getElementsByClassName("rank");
       for (let i = 0; i < rank.length; i++) {
-        let position = (rank[i].innerHTML = `Puesto ${i+1} ${userRank[i]} : ${puntosRank[i]} puntos`);
-      }
+        if(!(userRank[i]==undefined)){
+        let position = (rank[i].innerHTML = `Puesto ${i+1} - ${userRank[i]} : ${puntosRank[i]} puntos`);
+      }}
     });
 }
-
-// async function guardarPartida() {
-//   db.collection("juegos")
-//     .add({
-//       usuario: localStorage.getItem("usuario"), //acceder a valor de usuario logado
-//       fecha: Date(),
-//       puntuacion: partida.filter((pregunta) => pregunta).length,
-//     })
-//     .then((docRef) => {
-//       console.log("Document written with ID: ", docRef.id);
-//     })
-//     .catch((error) => {
-//       console.error("Error adding document: ", error);
-//     });
-// }
