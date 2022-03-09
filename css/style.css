@@ -134,7 +134,7 @@ label {
     border-radius: 6px;
 }
 
-#next {
+#next,#buttonSend,#volverAJugar {
     display:inline-block;
     height: 30px;
     width: 100px;
@@ -153,10 +153,14 @@ label {
     transition: 500ms;  
 }
 
-#next:hover {
+#next:hover, #buttonSend:hover, #volverAJugar {
     border: 2px solid #6dd6d1;
     animation: hueRotation 2s linear infinite;
 }
+
+
+
+
 
 @keyframes hueRotation {
     to {

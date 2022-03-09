@@ -29,6 +29,8 @@ const botonComenzar = document.getElementById("comenzar");
 const h1home = document.getElementById("h1Home");
 const userBox = document.getElementById("displayUser");
 const grafica = document.getElementById("grafica");
+const botonFinalizar = document.getElementById("buttonSend");
+
 
 //********* VARIABLES GLOBALES */
 let preguntas;
@@ -37,17 +39,30 @@ let numPregunta = 1; //contador de número de pregunta mostrada
 const partida = []; //resultado de las respuestas
 const results = "./results.html";
 
+
+
 /********) funciones auxiliares ******** */
 //funciones para mostrar y ocultar botones
 function ocultar(element) {
-  element.classList.add("display");
+  if (element != null) {
+    element.classList.add("display");
+  }
 }
 function esconder(element) {
-  //Refactorizar para todos los botones
-  element.classList.add("hidden");
+  if (element != null) {
+    //Refactorizar para todos los botones
+    element.classList.add("hidden");
+  }
 }
 function mostrar(element) {
-  element.classList.remove("display");
+  if (element != null) {
+    element.classList.remove("display");
+  }
+}
+function meter(element) {
+  if (element != null) {
+    element.classList.remove("hidden");
+  }
 }
 
 function mesLetraANumero(mes) {
@@ -95,7 +110,7 @@ function mesLetraANumero(mes) {
 }
 
 function fechasBonitas(arr) {
-  arr2 = [];
+  const arr2 = [];
   const fechasgrafica = arr.map((fecha) => {
     let mes = fecha.slice(4, 6);
     let dia = fecha.slice(6, 8);
@@ -139,9 +154,9 @@ firebase.auth().onAuthStateChanged((user) => {
     ocultar(botonLogin);
     mostrar(botonSignOut);
     mostrar(botonComenzar);
-    window.onload(pintarGrafica());
+    window.onload = pintarGrafica();
 
-    h1home.innerHTML = "Bienvenido " + usuarioActivo;
+    //h1home.innerHTML = "Bienvenido " + usuarioActivo;
     //meter función pintar gráfica
     //boton acceder al quiz
     const uid = user.uid;
@@ -183,6 +198,7 @@ async function buscarPreguntas() {
     console.log(`ERROR: ${error.stack}`);
   }
 }
+
 function barajarOpciones(array) {
   let currentIndex = array.length,
     randomIndex;
@@ -198,16 +214,18 @@ function barajarOpciones(array) {
 }
 
 /********** EJECUCION ASINCRONA *********** */
-async function ejecucionAsincrona() {
-  await buscarPreguntas();
-  await pintarPreguntas();
-  await getUserProfile();
-}
-ejecucionAsincrona();
 
+if (pregunta != null) {
+  async function ejecucionAsincrona() {
+    await buscarPreguntas();
+    await pintarPreguntas();
+  }
+  ejecucionAsincrona();
+}
 function pintarNumPregunta() {
   questionNumber.innerHTML = "question number " + numPregunta;
 }
+
 async function pintarPreguntas() {
   pregunta.innerHTML = preguntas[k].question;
   let opciones = [
@@ -227,6 +245,7 @@ async function pintarPreguntas() {
   opcion4.setAttribute("value", opciones[3]);
   pintarNumPregunta();
 }
+
 function unCheckOptions() {
   opcion1.checked = false;
   opcion2.checked = false;
@@ -260,6 +279,9 @@ function checkAnswers() {
     }
   }
 }
+
+
+
 async function guardarPartida() {
   db.collection("juegos")
     .add({
@@ -275,58 +297,65 @@ async function guardarPartida() {
     });
 }
 //********** BOTON NEXT  ************/
-botonNext.addEventListener("click", () => {
-  if (
-    !opcion1.checked &&
-    !opcion2.checked &&
-    !opcion3.checked &&
-    !opcion4.checked
-  ) {
-    alert("Debes seleccionar al menos una opción");
-  } else {
-    if (k < 10) {
-      checkAnswers();
-      unCheckOptions();
-      k++;
-      numPregunta++;
-      pintarPreguntas();
-      if (numPregunta < 10) {
-        pintarNumPregunta();
+if (botonNext != null) {
+  botonNext.addEventListener("click", () => {
+    if (
+      !opcion1.checked &&
+      !opcion2.checked &&
+      !opcion3.checked &&
+      !opcion4.checked
+    ) {
+      alert("Debes seleccionar al menos una opción");
+    } else {
+      if (k < 10) {
+        checkAnswers();
+        unCheckOptions();
+        k++;
+        numPregunta++;
+        pintarPreguntas();
+        if (numPregunta < 10) {
+          pintarNumPregunta();
+        }
+        console.log("valor k " + k);
+        console.log("partida", partida);
+        //console.log(preguntas.results);
       }
-      console.log("valor k " + k);
-      console.log("partida", partida);
-      //console.log(preguntas.results);
+      if (k === 9) {
+        botonFinalizar.classList.remove("hidden");
+        esconder(botonNext);
+      }
     }
-    if (k === 9) {
-      mostrar(botonFinalizar);
-      esconder(botonNext);
-    }
-  }
-});
+  });
+}
 /*************** BOTON FINALIZAR ******************/
-const botonFinalizar = document.createElement("button");
+/* const botonFinalizar = document.createElement("button");
 botonFinalizar.type = "button";
 botonFinalizar.setAttribute("id", "botonSend");
 botonFinalizar.innerText = "Finalizar";
-botonresults.appendChild(botonFinalizar);
-ocultar(botonFinalizar);
-botonFinalizar.addEventListener("click", () => {
-  if (
-    !opcion1.checked &&
-    !opcion2.checked &&
-    !opcion3.checked &&
-    !opcion4.checked
-  ) {
-    alert("Debes seleccionar al menos una opción");
-  } else {
-    checkAnswers();
-    unCheckOptions();
-    console.log(partida);
-    guardarPartida();
-    ocultar(botonFinalizar);
-    window.location = results;
-  }
-});
+botonresults.appendChild(botonFinalizar); */
+// mostrar(butonSend)
+// ocultar(botonFinalizar);
+if (botonFinalizar != null) {
+  botonFinalizar.addEventListener("click", () => {
+    if (
+      !opcion1.checked &&
+      !opcion2.checked &&
+      !opcion3.checked &&
+      !opcion4.checked
+    ) {
+      alert("Debes seleccionar al menos una opción");
+    } else {
+      checkAnswers();
+      unCheckOptions();
+      console.log(partida);
+      guardarPartida();
+      ocultar(botonFinalizar);
+      sessionStorage.setItem("partida", JSON.stringify(partida));
+      //sessionStorage.setITem("correctas",JSON.stringify(partida))
+      window.location = results;
+    }
+  });
+}
 //******** RECUPERAR DATOS PARA GRAFICA ******** */
 async function pintarGrafica() {
   let puntuaciones = []; //puntuaciones del usuario para la gráfica
@@ -418,6 +447,28 @@ async function pintarGrafica() {
 
 //************* RESULTS ************/
 
+if (contenedorPuntuacion != null) {
+  function pintarPuntuacionFinal() {
+    const jugada = JSON.parse(sessionStorage.getItem("partida"));
+    const contenedorPuntuacion = document.getElementById(
+      "contenedorPuntuacion"
+    );
+    let puntuacionFinal = jugada.filter((pregunta) => pregunta).length;
+    contenedorPuntuacion.innerHTML = `Tu puntuacion final es ${puntuacionFinal}/10`;
+  }
+}
 
+pintarPuntuacionFinal();
 
-partida.filter((pregunta) => pregunta).length
+function pintarResultados() {
+  const resultados = sessionStorage.getItem("correctas")
+  for (k = 0; k < partida.length; k++) {
+    let respuesta = document.getElementsByTagName("p")[k];
+    let correcta = preguntas[k].correct_answer;
+    if (partida[k] == true) {
+      respuesta.innerHTML = "Pregunta" + k + "acertada";
+    } else {
+      respuesta.innerHTML = "La respuesta correcta era " + correcta;
+    }
+  }
+}
